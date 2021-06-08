@@ -1,0 +1,17 @@
+td{
+	vertical-align: middle !important;
+}
+.amount{
+	text-align: right;
+}
+.negative{
+	color: red;
+}
+
+.text-start {
+  text-align: left !important;
+}
+
+.text-end {
+  text-align: right !important;
+}

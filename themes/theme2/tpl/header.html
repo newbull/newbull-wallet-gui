@@ -1,0 +1,83 @@
+﻿<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>{$title}{$wallet_name}</title>
+	<meta name="description" content="{$description}">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- Place favicon.ico in the root directory -->
+	<!-- all css here -->
+	<!-- bootstrap v4.6.0 css -->
+	<link rel="stylesheet" href="{$theme_path}css/bootstrap.min.css">
+	<link rel="stylesheet" href="{$theme_path}css/main.min.css?20210607">
+	<!-- all js here -->
+	<!-- jquery latest version -->
+	<script src="{$theme_path}js/jquery-2.1.4.min.js"></script>
+	<!-- bootstrap js -->
+	<script src="{$theme_path}js/bootstrap.bundle.min.js"></script>
+	<!-- main js -->
+	<script src="{$theme_path}js/main.min.js?20210608"></script>
+	<!-- Stats-Number-Scroller-Animation-JavaScript -->
+	<!-- <script src="{$theme_path}js/waypoints.min.js"></script>
+	<script src="{$theme_path}js/counterup.min.js"></script> -->
+	<script>
+		var symbol = '{$symbol}';
+		var theme_path = '{$theme_path}';
+		var ajax_url = '{$ajax_url}';
+		var explore_url_tx = '{$explore_url_tx}';
+		// $(document).ready(function ($) {
+		// });
+	</script>
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<!-- Image and text -->
+		<nav class="navbar navbar-light bg-light">
+			<a class="navbar-brand" href="{$root_path}">
+				<img src="{$theme_path}img/logo/logo-209x64-white-border.png" alt="{$name} logo"
+					class="d-inline-block align-top" style="width: 104px; height: 32px;">
+			</a>
+		</nav>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="{$root_path}">
+						Home <span class="sr-only">(current)</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{$root_path}{$wallet_path}">
+						Overview <span class="sr-only">(current)</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{$send}">
+						Send <span class="sr-only">(current)</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{$receive}">
+						Receive <span class="sr-only">(current)</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{$address}">
+						Address <span class="sr-only">(current)</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{$history}">
+						History <span class="sr-only">(current)</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</nav>

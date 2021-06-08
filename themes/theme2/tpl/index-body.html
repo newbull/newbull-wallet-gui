@@ -1,0 +1,95 @@
+﻿<div class="container">
+	<div class="table-responsive">
+		<table class="table table-bordered text-center">
+			<thead>
+				<tr>
+					<th class="amount">Balance</th>
+					<th class="amount">Unconfirmed</th>
+					<th class="text-center">Status</th>
+					<th class="text-center">Blockchain</th>
+					<th class="text-center">Connections</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="amount"><span class="balance">
+							<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+							Loading...
+						</span> {$symbol}
+					</td>
+					<td class="amount"><span class="unconfirmedbalance">
+							<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+							Loading...
+						</span> {$symbol}
+					</td>
+					<td><span class="status">
+							<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+							Loading...
+						</span>
+					</td>
+					<td><span class="chain">
+							<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+							Loading...
+						</span>
+					</td>
+					<td><span class="connections">
+							<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+							Loading...
+						</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="row">
+		<div class="col-md-3">
+			<h2>Accounts</h2>
+			<div class="table-responsive">
+				<table class="table table-bordered table-striped table-hover">
+					<thead>
+						<tr>
+							<th>Account</th>
+							<th class="amount">Balance</th>
+						</tr>
+					</thead>
+					<tbody class="accounts">
+						<tr>
+							<td colspan="2" class="text-center">
+								<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+								Loading...
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="col-md-9">
+			<h2>Latest Transactions</h2>
+			<div class="table-responsive">
+				<table class="table table-bordered table-striped table-hover text-center">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Account / Address</th>
+							<th></th>
+							<th></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody class="transactions">
+						<tr>
+							<td colspan="5">
+								<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+								Loading...
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	get_wallet_info();
+	var intval = setInterval("get_wallet_info()", 1000);
+</script>

@@ -1,0 +1,125 @@
+﻿<div class="container">
+	<div class="row">
+		<!-- <div class="col-xs-12 col-md-4">
+			<form>
+				<div class="form-group row">
+					<label for="move_to_account_from_account" class="col-sm-2 col-form-label">From</label>
+					<div class="col-sm-10">
+						<select class="form-control account" id="move_to_account_from_account"></select>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="move_to_account_to_account" class="col-sm-2 col-form-label">To</label>
+					<div class="col-sm-10">
+						<select class="form-control account" id="move_to_account_to_account"></select>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="move_to_account_amount" class="col-sm-2 col-form-label">Amount</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="move_to_account_amount" placeholder="Amount">
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="col-6 offset-3">
+						<button type="button" class="btn btn-info" onclick="move_to_account();">
+							Transfer Account</button>
+					</div>
+				</div>
+			</form>
+		</div> -->
+		<div class="col-xs-12 col-md-6">
+			<form>
+				<div class="form-group row">
+					<label for="address" class="col-sm-2 col-form-label">Address</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="address" placeholder="Address">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="amount" class="col-sm-2 col-form-label">Amount</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="amount" placeholder="Amount">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="subtract_fee_from_amount" class="col-sm-2 col-form-label"></label>
+					<div class="col-sm-10">
+						<div class="form-group form-check">
+							<input type="checkbox" class="form-check-input" id="subtract_fee_from_amount">
+							<label class="form-check-label" for="subtract_fee_from_amount">
+								Subtract Fee From Amount
+							</label>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<div class="col-6 offset-3 text-center">
+						<button type="button" class="btn btn-info" onclick="send_to_address(this);">Send</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="col-xs-12 col-md-6">
+			<form>
+				<!-- <div class="form-group row">
+					<label for="send_many_account" class="col-sm-2 col-form-label">Account</label>
+					<div class="col-sm-10">
+						<select class="form-control account" id="send_many_account"></select>
+					</div>
+				</div> -->
+				<div class="form-group row">
+					<label for="send_many_address_amount" class="col-sm-2 col-form-label">Address & Amount</label>
+					<div class="col-sm-10">
+						<textarea class="form-control" rows="3" id="send_many_address_amount"
+							placeholder="format:ADDRESS:AMOUNT, line by line"></textarea>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="send_many_subtract_fee_from_amount" class="col-sm-2 col-form-label"></label>
+					<div class="col-sm-10">
+						<div class="form-group form-check">
+							<input type="checkbox" class="form-check-input" id="send_many_subtract_fee_from_amount">
+							<label class="form-check-label" for="send_many_subtract_fee_from_amount">
+								Subtract Fee From Amount
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="col-6 offset-3 text-center">
+						<button type="button" class="btn btn-info" onclick="send_many(this);">Send Many</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div id="sendtxid" style="display:none;"></div>
+	<h2>Send Transactions</h2>
+	<div class="table-responsive">
+		<table class="table table-bordered table-striped table-hover text-center">
+			<thead>
+				<tr>
+					<th class=" text-center">#</th>
+					<th>Address / Txid</th>
+					<th></th>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody class="transactions">
+				<tr>
+					<td colspan="6">
+						<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+						Loading...
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<script>
+	get_send();
+	// get_account_info();
+</script>
