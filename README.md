@@ -1,6 +1,6 @@
 # NewBull Wallet GUI
 
-[NewBull Wallet GUI](https://github.com/newbull/wallet-gui) is a simple and lightweight wallet gui written in PHP(no database required) with `easybitcoin.php` ([get it here](https://github.com/aceat64/EasyBitcoin-PHP)).
+[NewBull Wallet GUI](https://github.com/newbull/newbull-wallet-gui) is a simple and lightweight wallet gui written in PHP(no database required) with `easybitcoin.php` ([get it here](https://github.com/aceat64/EasyBitcoin-PHP)).
 
 NewBull Wallet GUI work with [NewBull Core](https://newbull.org) fine. It's should work with others pow block chain, such as Bitcoin.
 
