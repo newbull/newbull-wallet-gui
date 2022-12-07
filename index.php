@@ -1,5 +1,5 @@
 <?php
-$version = '1.5.0';
+$version = '0.14.2.17';
 define("IN_SCRIPT", true);
 
 require_once 'conf/config.php';
@@ -28,6 +28,7 @@ if (!isset($_SERVER['PHP_AUTH_USER'])) {
 }
 
 //init url path prefix
+$config["wallet_path"] = substr(str_replace(dirname(dirname(__FILE__)), "", __DIR__), 1) . "/";
 if ($config["url_rewrite"]) {
     $name = isset($_GET['name']) ? $_GET['name'] : "";
     // list($url_param_get_action, $url_param_get_value) = explode("/", $name);
@@ -49,30 +50,35 @@ switch ($url_param_get_action) {
     case "":
         $output["title"] = "";
         $output["description"] = $config["description"];
+        $output["current_page"] = "";
 
         exit(get_html("index-body", $output));
         break;
     case "send":
         $output["title"] = "Send - ";
         $output["description"] = $config["description"];
+        $output["current_page"] = "send";
 
         exit(get_html("send-body", $output));
         break;
     case "receive":
         $output["title"] = "Receive - ";
         $output["description"] = $config["description"];
+        $output["current_page"] = "receive";
 
         exit(get_html("receive-body", $output));
         break;
     case "address":
         $output["title"] = "Address - ";
         $output["description"] = $config["description"];
+        $output["current_page"] = "address";
 
         exit(get_html("address-body", $output));
         break;
     case "history":
         $output["title"] = "History - ";
         $output["description"] = $config["description"];
+        $output["current_page"] = "history";
 
         exit(get_html("history-body", $output));
         break;
@@ -109,7 +115,8 @@ function html_replace_common($html)
     $common["start_year"] = $config["start_year"];
     $common["year"] = date("Y", time());
     $common["version"] = $version;
-    $common["explore_url_tx"] = $config["explore_url_tx"];
+    $common["explore_url_block"] = $config["root_path"] . $config["explore_url_block"];
+    $common["explore_url_tx"] = $config["root_path"] . $config["explore_url_tx"];
 
     return html_replace(html_replace($html, $url_path), $common);
 }

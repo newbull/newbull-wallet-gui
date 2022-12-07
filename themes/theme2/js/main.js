@@ -48,6 +48,7 @@ function formatBlance(balance) {
 }
 
 function playAudio(strArr) {
+	return true;
 	var audiofile = '';
 	var getArr = strArr.split(",");
 	var type = navigator.appName
@@ -73,12 +74,14 @@ var audioblockTime = 0;
 var audioListtransactionsIndex = 0;
 
 function get_wallet_info() {
+	$(".status").text("");
+	var connections = 0;
 	$.ajax({
 		url: ajax_url,
 		type: 'post',
 		dataType: 'json',
 		data: {
-			action: "get_wallet_info"
+			action: "getinfo"
 		},
 		success: function (data) {
 			// console.log(data);
@@ -88,180 +91,14 @@ function get_wallet_info() {
 				//obj.reverse();
 				//console.log(obj);
 				$(".balance").text(formatBlance(obj.balance));
-				$(".connections").text(obj.connections);
-				$(".chain").text(obj.chain);
-
-				if (obj.connections >= 1) {
-					if (obj.generate) {
-						$(".status").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;Mining...');
-						//console.log(audioFlag);
-						if (audioFlag != 1) {
-							audioFlag = 1;
-							playAudio('3');
-						}
-					} else {
-						$(".status").html('<span class="spinner-border spinner-border-sm text-success" role="status" aria-hidden="true"></span>&nbsp;Synchronizing...');
-						//console.log(audioFlag);
-						if (audioFlag != 2) {
-							audioFlag = 2;
-							playAudio('2');
-						}
-					}
-				} else {
-					$(".status").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;Connecting...');
-					//console.log(audioFlag);
-					if (audioFlag != 3) {
-						audioFlag = 3;
-						playAudio('1');
-					}
-				}
-				var listsinceblock = obj.listsinceblock.transactions;
-				//console.log(listsinceblock);
-				var immaturebalance = 0;
-				$.each(listsinceblock, function (index) {
-					//console.log(listsinceblock[index]);
-
-					if (listsinceblock[index].category == 'immature') {
-						immaturebalance += listsinceblock[index].amount;
-					}
-				});
-				$(".unconfirmedbalance").text(formatBlance(obj.unconfirmedbalance + immaturebalance));
-				$(".accounts").html('');
-				var listaccounts = obj.listaccounts;
-				// console.log(listaccounts);
-				$.each(listaccounts, function (key, value) {
-					// console.log(key + ": " + value);
-					$('.accounts').append(
-						'<tr>' +
-						'<td>' + (key == "" ? "default" : key) + '</td>' +
-						'<td class="amount">' + formatBlance(value) + " " + symbol + '</td>' +
-						'</tr>'
-					);
-				});
-
-				$('.transactions').html('');
-				var listtransactions = obj.listtransactions;
-				//console.log(listtransactions);
-				$.each(listtransactions, function (index) {
-					//console.log(listtransactions[index]);
-
-					if (listtransactions[index].generated == true) {
-						var categoryImg = 'img/icon/tx_mined.png';
-					} else {
-						switch (listtransactions[index].category) {
-							case 'send':
-								var categoryImg = 'img/icon/tx_output.png';
-								break;
-							case 'receive':
-								var categoryImg = 'img/icon/tx_input.png';
-								break;
-							case 'move':
-							default:
-								var categoryImg = 'img/icon/tx_inout.png';
-								break;
-						}
-					}
-					//var unixTimestamp = new Date(listtransactions[index].time * 1000);
-					//time = unixTimestamp.toLocaleString()
-
-					if (listtransactions[index].category == 'receive') {
-						//check first, or it will splice index0
-						// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
-						// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
-						// }
-						// var time = new Date(listtransactions[index].time * 1000).Format("yyyy-MM-dd hh:mm:ss");
-						switch (true) {
-							case listtransactions[index].confirmations >= 6:
-								var confirmationsImg = 'img/icon/transaction2.png';
-								break;
-							case listtransactions[index].confirmations >= 5:
-								var confirmationsImg = 'img/icon/clock5.png';
-								break;
-							case listtransactions[index].confirmations >= 4:
-								var confirmationsImg = 'img/icon/clock4.png';
-								break;
-							case listtransactions[index].confirmations >= 3:
-								var confirmationsImg = 'img/icon/clock3.png';
-								break;
-							case listtransactions[index].confirmations >= 2:
-								var confirmationsImg = 'img/icon/clock2.png';
-								break;
-							default:
-								var confirmationsImg = 'img/icon/clock1.png';
-								break;
-						}
-					} else {
-						switch (true) {
-							case listtransactions[index].confirmations >= 100:
-								var confirmationsImg = 'img/icon/transaction2.png';
-								break;
-							case listtransactions[index].confirmations >= 80:
-								var confirmationsImg = 'img/icon/clock5.png';
-								break;
-							case listtransactions[index].confirmations >= 60:
-								var confirmationsImg = 'img/icon/clock4.png';
-								break;
-							case listtransactions[index].confirmations >= 40:
-								var confirmationsImg = 'img/icon/clock3.png';
-								break;
-							case listtransactions[index].confirmations >= 20:
-								var confirmationsImg = 'img/icon/clock2.png';
-								break;
-							default:
-								var confirmationsImg = 'img/icon/clock1.png';
-								break;
-						}
-					}
-					var amount = listtransactions[index].amount;
-					if (amount > 0) {
-						var amountClass = '';
-						var amountSymbol = '+';
-					} else {
-						var amountClass = 'negative';
-						var amountSymbol = '';
-					}
-					var td_account_address = "";
-					if (listtransactions[index].category == 'move') {
-						td_account_address = '<span style="color:blue;">' + (listtransactions[index].account == "" ? "default" : listtransactions[index].account) + "</span><br>" + (listtransactions[index].otheraccount == "" ? "default" : listtransactions[index].otheraccount);
-					} else {
-						td_account_address = '<span style="color:blue;">' + (listtransactions[index].account == "" ? "default" : listtransactions[index].account) + "</span><br>" + listtransactions[index].address;
-					}
-					$('.transactions').prepend(
-						'<tr>' +
-						'<td><img src="' + theme_path + categoryImg + '" width="36" height="36" /></td>' +
-						'<td style="text-align:left;">' + td_account_address + '</td>' +
-						'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
-						'<td>' + (listtransactions[index].confirmations ? '<img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')' : '<img src="' + theme_path + 'img/icon/transaction2.png" width="24" height="24" />') + '</td>' +
-						'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
-						'</tr>'
-					);
-					audioListtransactionsIndex = index;
-				});
-				// console.log('audioListtransactionsIndex:' + audioListtransactionsIndex + ', audioblockTime:' + audioblockTime);
-				if (!audioblockTime) {
-					audioblockTime = listtransactions[audioListtransactionsIndex] ? listtransactions[audioListtransactionsIndex].time : 0;
-					// console.log('init:' + audioblockTime);
-				} else {
-					if (audioblockTime != listtransactions[audioListtransactionsIndex].time) {
-						// console.log(audioblockTime);
-						audioblockTime = listtransactions[audioListtransactionsIndex].time;
-						// console.log(audioblockTime);
-						if (listtransactions[audioListtransactionsIndex].generated == true) {
-							playAudio('4,5,6');
-							// console.log('4,5,6');
-						} else {
-							if (listtransactions[audioListtransactionsIndex].amount > 0) {
-								playAudio('7,8');
-								// console.log('7,8');
-							}
-						}
-					}
-				}
+				connections = obj.connections;
+				$(".connections").text(connections);
 			} else {
 				// $(".balance").text();
 				// $(".unconfirmedbalance").text('');
 				$(".status").text(data.e);
 				// $('table').html('');
+				$(".wallet_status").html('<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>Loading...');
 			};
 		},
 		error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -269,9 +106,493 @@ function get_wallet_info() {
 			// $(".unconfirmedbalance").text('');
 			$(".status").text(textStatus);
 			// $('table').html('');
+			$(".wallet_status").html('<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>Loading...');
 		},
 		complete: function (XMLHttpRequest, textStatus) {
+			$.ajax({
+				url: ajax_url,
+				type: 'post',
+				dataType: 'json',
+				data: {
+					action: "getmininginfo"
+				},
+				success: function (data) {
+					// console.log(data);
+					if (data.s) {
+						var obj = data;
+						//lasttime = obj[0].timeline;
+						//obj.reverse();
+						//console.log(obj);
+						$(".chain").text(obj.chain);
 
+						if (connections > 0) {
+							if (obj.generate) {
+								$(".wallet_status").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;Mining...');
+								//console.log(audioFlag);
+								if (audioFlag != 1) {
+									audioFlag = 1;
+									playAudio('3');
+								}
+							} else {
+								$(".wallet_status").html('<span class="spinner-border spinner-border-sm text-success" role="status" aria-hidden="true"></span>&nbsp;Synchronizing...');
+								//console.log(audioFlag);
+								if (audioFlag != 2) {
+									audioFlag = 2;
+									playAudio('2');
+								}
+							}
+						} else {
+							$(".wallet_status").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;Connecting...');
+							//console.log(audioFlag);
+							if (audioFlag != 3) {
+								audioFlag = 3;
+								playAudio('1');
+							}
+						}
+					} else {
+						// $(".balance").text();
+						// $(".unconfirmedbalance").text('');
+						$(".status").text(data.e);
+						// $('table').html('');
+					};
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					// $(".balance").text(textStatus);
+					// $(".unconfirmedbalance").text('');
+					$(".status").text(textStatus);
+					// $('table').html('');
+				},
+				complete: function (XMLHttpRequest, textStatus) {
+					$.ajax({
+						url: ajax_url,
+						type: 'post',
+						dataType: 'json',
+						data: {
+							action: "getwalletinfo"
+						},
+						success: function (data) {
+							// console.log(data);
+							if (data.s) {
+								var obj = data;
+								$(".unconfirmedbalance").text(formatBlance(obj.unconfirmed_balance + obj.immature_balance));
+								$(".totaltransactions").text(obj.txcount);
+								$(".walletversion").text(obj.walletversion);
+							} else {
+								// $(".balance").text();
+								// $(".unconfirmedbalance").text('');
+								$(".status").text(data.e);
+								console.log($(".status").text());
+								// $('table').html('');
+							};
+						},
+						error: function (XMLHttpRequest, textStatus, errorThrown) {
+							// $(".balance").text(textStatus);
+							// $(".unconfirmedbalance").text('');
+							$(".status").text(textStatus);
+							console.log($(".status").text());
+							// $('table').html('');
+						},
+						complete: function (XMLHttpRequest, textStatus) {
+
+							// $.ajax({
+							// 	url: ajax_url,
+							// 	type: 'post',
+							// 	dataType: 'json',
+							// 	data: {
+							// 		action: "listaccounts"
+							// 	},
+							// 	success: function (data) {
+							// 		// console.log(data);
+							// 		if (data.s) {
+							// 			var obj = data;
+							// 			//lasttime = obj[0].timeline;
+							// 			//obj.reverse();
+							// 			//console.log(obj);
+
+							// 			$(".accounts").html('');
+							// 			var listaccounts = obj.listaccounts;
+							// 			// console.log(listaccounts);
+							// 			$.each(listaccounts, function (key, value) {
+							// 				// console.log(key + ": " + value);
+							// 				$('.accounts').append(
+							// 					'<tr>' +
+							// 					'<td>' + (key == "" ? "default" : key) + '</td>' +
+							// 					'<td class="amount">' + formatBlance(value) + " " + symbol + '</td>' +
+							// 					'</tr>'
+							// 				);
+							// 			});
+							// 		} else {
+							// 			// $(".balance").text();
+							// 			// $(".unconfirmedbalance").text('');
+							// 			$(".status").text(data.e);
+							// 			// $('table').html('');
+							// 		};
+							// 	},
+							// 	error: function (XMLHttpRequest, textStatus, errorThrown) {
+							// 		// $(".balance").text(textStatus);
+							// 		// $(".unconfirmedbalance").text('');
+							// 		$(".status").text(textStatus);
+							// 		// $('table').html('');
+							// 	},
+							// 	complete: function (XMLHttpRequest, textStatus) {
+							$.ajax({
+								url: ajax_url,
+								type: 'post',
+								dataType: 'json',
+								data: {
+									action: "listtransactions"
+								},
+								success: function (data) {
+									// console.log(data);
+									if (data.s) {
+										var obj = data;
+										//lasttime = obj[0].timeline;
+										//obj.reverse();
+										//console.log(obj);
+
+										$('.transactions').html('');
+										var listtransactions = obj.listtransactions;
+										//console.log(listtransactions);
+										if (listtransactions.length > 0) {
+											$.each(listtransactions, function (index) {
+												//console.log(listtransactions[index]);
+
+												if (listtransactions[index].generated == true) {
+													var categoryImg = 'img/icon/tx_mined.png';
+												} else {
+													switch (listtransactions[index].category) {
+														case 'send':
+															var categoryImg = 'img/icon/tx_output.png';
+															break;
+														case 'receive':
+															var categoryImg = 'img/icon/tx_input.png';
+															break;
+														case 'move':
+														default:
+															var categoryImg = 'img/icon/tx_inout.png';
+															break;
+													}
+												}
+												//var unixTimestamp = new Date(listtransactions[index].time * 1000);
+												//time = unixTimestamp.toLocaleString()
+
+												var confirmationsImg = 'img/icon/clock1.png';
+												if (listtransactions[index].category == 'receive') {
+													//check first, or it will splice index0
+													// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
+													// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
+													// }
+													// var time = new Date(listtransactions[index].time * 1000).Format("yyyy-MM-dd hh:mm:ss");
+													switch (true) {
+														case listtransactions[index].confirmations >= 6:
+															confirmationsImg = 'img/icon/transaction2.png';
+															break;
+														case listtransactions[index].confirmations >= 5:
+															confirmationsImg = 'img/icon/clock5.png';
+															break;
+														case listtransactions[index].confirmations >= 4:
+															confirmationsImg = 'img/icon/clock4.png';
+															break;
+														case listtransactions[index].confirmations >= 3:
+															confirmationsImg = 'img/icon/clock3.png';
+															break;
+														case listtransactions[index].confirmations >= 2:
+															confirmationsImg = 'img/icon/clock2.png';
+															break;
+														default:
+															confirmationsImg = 'img/icon/clock1.png';
+															break;
+													}
+												} else {
+													switch (true) {
+														case listtransactions[index].confirmations >= 100:
+															confirmationsImg = 'img/icon/transaction2.png';
+															break;
+														case listtransactions[index].confirmations >= 80:
+															confirmationsImg = 'img/icon/clock5.png';
+															break;
+														case listtransactions[index].confirmations >= 60:
+															confirmationsImg = 'img/icon/clock4.png';
+															break;
+														case listtransactions[index].confirmations >= 40:
+															confirmationsImg = 'img/icon/clock3.png';
+															break;
+														case listtransactions[index].confirmations >= 20:
+															confirmationsImg = 'img/icon/clock2.png';
+															break;
+														default:
+															confirmationsImg = 'img/icon/clock1.png';
+															break;
+													}
+												}
+												var amount = listtransactions[index].amount;
+												if (amount > 0) {
+													var amountClass = '';
+													var amountSymbol = '+';
+												} else {
+													var amountClass = 'negative';
+													var amountSymbol = '';
+												}
+												// var td_account_address = "";
+												// if (listtransactions[index].category == 'move') {
+												// 	td_account_address = '<span style="color:blue;">' + (listtransactions[index].account == "" ? "default" : listtransactions[index].account) + "</span><br>" + (listtransactions[index].otheraccount == "" ? "default" : listtransactions[index].otheraccount);
+												// } else {
+												// 	td_account_address = '<span style="color:blue;">' + (listtransactions[index].account == "" ? "default" : listtransactions[index].account) + "</span><br>" + listtransactions[index].address;
+												// }
+												var td_account_address = listtransactions[index].address;
+												var td_block = listtransactions[index].blockhash;
+												var td_txid = listtransactions[index].txid;
+
+												$('.transactions').prepend(
+													'<tr>' +
+													'<td><img src="' + theme_path + categoryImg + '" width="36" height="36" /></td>' +
+													'<td style="text-align:left;">' + td_account_address + '</td>' +
+													'<td><a href="' + explore_url_block + td_block + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_mined.png" width="36" height="36" /></a>' + '</td>' +
+													'<td><a href="' + explore_url_tx + td_txid + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_inout.png" width="36" height="36" /></a>' + '</td>' +
+													'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
+													'<td>' + '<img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')' + '</td>' +
+													'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
+													'</tr>'
+												);
+												audioListtransactionsIndex = index;
+											});
+										}
+										else {
+											$('.transactions').prepend(
+												'<tr><td class="text-start" colspan="7">The list of latest transactions is currently empty.</td></tr>'
+											);
+										}
+										// console.log('audioListtransactionsIndex:' + audioListtransactionsIndex + ', audioblockTime:' + audioblockTime);
+										if (!audioblockTime) {
+											audioblockTime = listtransactions[audioListtransactionsIndex] ? listtransactions[audioListtransactionsIndex].time : 0;
+											// console.log('init:' + audioblockTime);
+										} else {
+											if (audioblockTime != listtransactions[audioListtransactionsIndex].time) {
+												// console.log(audioblockTime);
+												audioblockTime = listtransactions[audioListtransactionsIndex].time;
+												// console.log(audioblockTime);
+												if (listtransactions[audioListtransactionsIndex].generated == true) {
+													playAudio('4,5,6');
+													// console.log('4,5,6');
+												} else {
+													if (listtransactions[audioListtransactionsIndex].amount > 0) {
+														playAudio('7,8');
+														// console.log('7,8');
+													}
+												}
+											}
+										}
+									} else {
+										// $(".balance").text();
+										// $(".unconfirmedbalance").text('');
+										$(".status").text(data.e);
+										// $('table').html('');
+									};
+								},
+								error: function (XMLHttpRequest, textStatus, errorThrown) {
+									// $(".balance").text(textStatus);
+									// $(".unconfirmedbalance").text('');
+									$(".status").text(textStatus);
+									// $('table').html('');
+								},
+								complete: function (XMLHttpRequest, textStatus) {
+									$.ajax({
+										url: ajax_url,
+										type: 'post',
+										dataType: 'json',
+										data: {
+											action: "listmemorypooltransactions"
+										},
+										success: function (data) {
+											// console.log(data);
+											if (data.s) {
+												var obj = data;
+												//lasttime = obj[0].timeline;
+												//obj.reverse();
+												//console.log(obj);
+												var listmemorypooltransactions = obj.listmemorypooltransactions;
+
+												$('.listmemorypooltransactions').html('');
+												$('.memorypooltransactions').text(listmemorypooltransactions.length);
+
+												if (listmemorypooltransactions.length > 0) {
+													$.each(listmemorypooltransactions, function (index) {
+														var _listmemorypooltransaction = listmemorypooltransactions[index];
+														var _output = '<tr><td class="text-start">' +
+															'<a href="' + explore_url_tx + _listmemorypooltransaction.tx + '" target="_blank">' + _listmemorypooltransaction.tx + '</a>' +
+															'</td>' +
+															'<td class="text-start" colspan="2">' +
+															'<table class="table table-borderless table-sm"><tbody>';
+														for (var i = 0; i < _listmemorypooltransaction.vout.length; i++) {
+															var _vout = _listmemorypooltransaction.vout[i];
+															_output += '<tr><td class="text-start" style="width:40%">' + _vout.value + ' ' + symbol + '</td><td class="text-start">';
+															for (var j = 0; j < _vout.addresses.length; j++) {
+																_output += _vout.addresses[j] + '<br>';
+															}
+															_output += '</td></tr>';
+														}
+														_output += '</tbody></table>';
+														_output += '</td></tr>';
+
+														$('.listmemorypooltransactions').prepend(
+															_output
+														);
+													});
+												}
+												else {
+													$('.listmemorypooltransactions').prepend(
+														'<tr><td class="text-start" colspan="3">The list of memory pool is currently empty.</td></tr>'
+													);
+												}
+												//console.log(listtransactions);
+												// $.each(listtransactions, function (index) {
+												// 	//console.log(listtransactions[index]);
+
+												// 	if (listtransactions[index].generated == true) {
+												// 		var categoryImg = 'img/icon/tx_mined.png';
+												// 	} else {
+												// 		switch (listtransactions[index].category) {
+												// 			case 'send':
+												// 				var categoryImg = 'img/icon/tx_output.png';
+												// 				break;
+												// 			case 'receive':
+												// 				var categoryImg = 'img/icon/tx_input.png';
+												// 				break;
+												// 			case 'move':
+												// 			default:
+												// 				var categoryImg = 'img/icon/tx_inout.png';
+												// 				break;
+												// 		}
+												// 	}
+												// 	//var unixTimestamp = new Date(listtransactions[index].time * 1000);
+												// 	//time = unixTimestamp.toLocaleString()
+
+												// 	if (listtransactions[index].category == 'receive') {
+												// 		//check first, or it will splice index0
+												// 		// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
+												// 		// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
+												// 		// }
+												// 		// var time = new Date(listtransactions[index].time * 1000).Format("yyyy-MM-dd hh:mm:ss");
+												// 		switch (true) {
+												// 			case listtransactions[index].confirmations >= 6:
+												// 				var confirmationsImg = 'img/icon/transaction2.png';
+												// 				break;
+												// 			case listtransactions[index].confirmations >= 5:
+												// 				var confirmationsImg = 'img/icon/clock5.png';
+												// 				break;
+												// 			case listtransactions[index].confirmations >= 4:
+												// 				var confirmationsImg = 'img/icon/clock4.png';
+												// 				break;
+												// 			case listtransactions[index].confirmations >= 3:
+												// 				var confirmationsImg = 'img/icon/clock3.png';
+												// 				break;
+												// 			case listtransactions[index].confirmations >= 2:
+												// 				var confirmationsImg = 'img/icon/clock2.png';
+												// 				break;
+												// 			default:
+												// 				var confirmationsImg = 'img/icon/clock1.png';
+												// 				break;
+												// 		}
+												// 	} else {
+												// 		switch (true) {
+												// 			case listtransactions[index].confirmations >= 100:
+												// 				var confirmationsImg = 'img/icon/transaction2.png';
+												// 				break;
+												// 			case listtransactions[index].confirmations >= 80:
+												// 				var confirmationsImg = 'img/icon/clock5.png';
+												// 				break;
+												// 			case listtransactions[index].confirmations >= 60:
+												// 				var confirmationsImg = 'img/icon/clock4.png';
+												// 				break;
+												// 			case listtransactions[index].confirmations >= 40:
+												// 				var confirmationsImg = 'img/icon/clock3.png';
+												// 				break;
+												// 			case listtransactions[index].confirmations >= 20:
+												// 				var confirmationsImg = 'img/icon/clock2.png';
+												// 				break;
+												// 			default:
+												// 				var confirmationsImg = 'img/icon/clock1.png';
+												// 				break;
+												// 		}
+												// 	}
+												// 	var amount = listtransactions[index].amount;
+												// 	if (amount > 0) {
+												// 		var amountClass = '';
+												// 		var amountSymbol = '+';
+												// 	} else {
+												// 		var amountClass = 'negative';
+												// 		var amountSymbol = '';
+												// 	}
+												// 	// var td_account_address = "";
+												// 	// if (listtransactions[index].category == 'move') {
+												// 	// 	td_account_address = '<span style="color:blue;">' + (listtransactions[index].account == "" ? "default" : listtransactions[index].account) + "</span><br>" + (listtransactions[index].otheraccount == "" ? "default" : listtransactions[index].otheraccount);
+												// 	// } else {
+												// 	// 	td_account_address = '<span style="color:blue;">' + (listtransactions[index].account == "" ? "default" : listtransactions[index].account) + "</span><br>" + listtransactions[index].address;
+												// 	// }
+												// 	var td_account_address = listtransactions[index].address;
+												// 	var td_block = listtransactions[index].blockhash;
+												// 	var td_txid = listtransactions[index].txid;
+
+
+
+												// 	$('.transactions').prepend(
+												// 		'<tr>' +
+												// 		'<td><img src="' + theme_path + categoryImg + '" width="36" height="36" /></td>' +
+												// 		'<td style="text-align:left;">' + td_account_address + '</td>' +
+												// 		'<td><a href="' + explore_url_block + td_block + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_mined.png" width="36" height="36" /></a>' + '</td>' +
+												// 		'<td><a href="' + explore_url_tx + td_txid + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_inout.png" width="36" height="36" /></a>' + '</td>' +
+												// 		'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
+												// 		'<td>' + (listtransactions[index].confirmations ? '<img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')' : '<img src="' + theme_path + 'img/icon/transaction2.png" width="24" height="24" />') + '</td>' +
+												// 		'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
+												// 		'</tr>'
+												// 	);
+												// 	audioListtransactionsIndex = index;
+												// });
+												// console.log('audioListtransactionsIndex:' + audioListtransactionsIndex + ', audioblockTime:' + audioblockTime);
+												// if (!audioblockTime) {
+												// 	audioblockTime = listtransactions[audioListtransactionsIndex] ? listtransactions[audioListtransactionsIndex].time : 0;
+												// 	// console.log('init:' + audioblockTime);
+												// } else {
+												// 	if (audioblockTime != listtransactions[audioListtransactionsIndex].time) {
+												// 		// console.log(audioblockTime);
+												// 		audioblockTime = listtransactions[audioListtransactionsIndex].time;
+												// 		// console.log(audioblockTime);
+												// 		if (listtransactions[audioListtransactionsIndex].generated == true) {
+												// 			playAudio('4,5,6');
+												// 			// console.log('4,5,6');
+												// 		} else {
+												// 			if (listtransactions[audioListtransactionsIndex].amount > 0) {
+												// 				playAudio('7,8');
+												// 				// console.log('7,8');
+												// 			}
+												// 		}
+												// 	}
+												// }
+											} else {
+												// $(".balance").text();
+												// $(".unconfirmedbalance").text('');
+												$(".status").text(data.e);
+												// $('table').html('');
+											};
+										},
+										error: function (XMLHttpRequest, textStatus, errorThrown) {
+											// $(".balance").text(textStatus);
+											// $(".unconfirmedbalance").text('');
+											$(".status").text(textStatus);
+											// $('table').html('');
+										},
+										complete: function (XMLHttpRequest, textStatus) {
+
+										}
+									});
+								}
+							});
+							// }
+							// });
+						}
+					});
+				}
+			});
 		}
 	});
 }
@@ -292,91 +613,105 @@ function get_history() {
 					return a.time - b.time
 				});
 				$('.transactions').html('');
-				$.each(listtransactions, function (index) {
-					//console.log(listtransactions[index]);
-					if (listtransactions[index].generated == true) {
-						var categoryImg = 'img/icon/tx_mined.png';
-					} else {
-						switch (listtransactions[index].category) {
-							case 'send':
-								var categoryImg = 'img/icon/tx_output.png';
-								break;
-							case 'receive':
-								var categoryImg = 'img/icon/tx_input.png';
-								break;
-							default:
-								var categoryImg = 'img/icon/tx_inout.png';
-								break;
+				if (listtransactions.length > 0) {
+					$.each(listtransactions, function (index) {
+						//console.log(listtransactions[index]);
+						if (listtransactions[index].generated == true) {
+							var categoryImg = 'img/icon/tx_mined.png';
+						} else {
+							switch (listtransactions[index].category) {
+								case 'send':
+									var categoryImg = 'img/icon/tx_output.png';
+									break;
+								case 'receive':
+									var categoryImg = 'img/icon/tx_input.png';
+									break;
+								default:
+									var categoryImg = 'img/icon/tx_inout.png';
+									break;
+							}
 						}
-					}
 
-					if (listtransactions[index].category == 'receive') {
-						//check first, or it will splice index0
-						// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
-						// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
-						// }
-						switch (true) {
-							case listtransactions[index].confirmations >= 6:
-								var confirmationsImg = 'img/icon/transaction2.png';
-								break;
-							case listtransactions[index].confirmations >= 5:
-								var confirmationsImg = 'img/icon/clock5.png';
-								break;
-							case listtransactions[index].confirmations >= 4:
-								var confirmationsImg = 'img/icon/clock4.png';
-								break;
-							case listtransactions[index].confirmations >= 3:
-								var confirmationsImg = 'img/icon/clock3.png';
-								break;
-							case listtransactions[index].confirmations >= 2:
-								var confirmationsImg = 'img/icon/clock2.png';
-								break;
-							default:
-								var confirmationsImg = 'img/icon/clock1.png';
-								break;
+						var confirmationsImg = 'img/icon/clock1.png';
+						if (listtransactions[index].category == 'receive') {
+							//check first, or it will splice index0
+							// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
+							// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
+							// }
+							switch (true) {
+								case listtransactions[index].confirmations >= 6:
+									confirmationsImg = 'img/icon/transaction2.png';
+									break;
+								case listtransactions[index].confirmations >= 5:
+									confirmationsImg = 'img/icon/clock5.png';
+									break;
+								case listtransactions[index].confirmations >= 4:
+									confirmationsImg = 'img/icon/clock4.png';
+									break;
+								case listtransactions[index].confirmations >= 3:
+									confirmationsImg = 'img/icon/clock3.png';
+									break;
+								case listtransactions[index].confirmations >= 2:
+									confirmationsImg = 'img/icon/clock2.png';
+									break;
+								default:
+									confirmationsImg = 'img/icon/clock1.png';
+									break;
+							}
+						} else {
+							switch (true) {
+								case listtransactions[index].confirmations >= 100:
+									confirmationsImg = 'img/icon/transaction2.png';
+									break;
+								case listtransactions[index].confirmations >= 80:
+									confirmationsImg = 'img/icon/clock5.png';
+									break;
+								case listtransactions[index].confirmations >= 60:
+									confirmationsImg = 'img/icon/clock4.png';
+									break;
+								case listtransactions[index].confirmations >= 40:
+									confirmationsImg = 'img/icon/clock3.png';
+									break;
+								case listtransactions[index].confirmations >= 20:
+									confirmationsImg = 'img/icon/clock2.png';
+									break;
+								default:
+									confirmationsImg = 'img/icon/clock1.png';
+									break;
+							}
 						}
-					} else {
-						switch (true) {
-							case listtransactions[index].confirmations >= 100:
-								var confirmationsImg = 'img/icon/transaction2.png';
-								break;
-							case listtransactions[index].confirmations >= 80:
-								var confirmationsImg = 'img/icon/clock5.png';
-								break;
-							case listtransactions[index].confirmations >= 60:
-								var confirmationsImg = 'img/icon/clock4.png';
-								break;
-							case listtransactions[index].confirmations >= 40:
-								var confirmationsImg = 'img/icon/clock3.png';
-								break;
-							case listtransactions[index].confirmations >= 20:
-								var confirmationsImg = 'img/icon/clock2.png';
-								break;
-							default:
-								var confirmationsImg = 'img/icon/clock1.png';
-								break;
+						var amount = listtransactions[index].amount;
+						if (amount > 0) {
+							var amountClass = '';
+							var amountSymbol = '+';
+						} else {
+							var amountClass = 'negative';
+							var amountSymbol = '';
 						}
-					}
-					var amount = listtransactions[index].amount;
-					if (amount > 0) {
-						var amountClass = '';
-						var amountSymbol = '+';
-					} else {
-						var amountClass = 'negative';
-						var amountSymbol = '';
-					}
 
+						var td_account_address = listtransactions[index].address;
+						var td_block = listtransactions[index].blockhash;
+						var td_txid = listtransactions[index].txid;
+
+						$('.transactions').prepend(
+							'<tr>' +
+							'<td>' + (index + 1) + '</td>' +
+							'<td><img src="' + theme_path + categoryImg + '" width="36" height="36" /></td>' +
+							'<td style="text-align:left;">' + td_account_address + '</td>' +
+							'<td><a href="' + explore_url_block + td_block + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_mined.png" width="36" height="36" /></a>' + '</td>' +
+							'<td><a href="' + explore_url_tx + td_txid + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_inout.png" width="36" height="36" /></a>' + '</td>' +
+							'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
+							'<td><img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')</td>' +
+							'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
+							'</tr>'
+						);
+					});
+				}
+				else {
 					$('.transactions').prepend(
-						'<tr>' +
-						'<td>' + (index + 1) + '</td>' +
-						'<td><img src="' + theme_path + categoryImg + '" width="36" height="36" /></td>' +
-						'<td style="text-align:left;"><span style="color:blue;">' + (listtransactions[index].account == "" ? "default" : listtransactions[index].account) + "</span><br>" + listtransactions[index].address + '</td>' +
-						'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
-						'<td><img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')</td>' +
-						'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
-						'</tr>'
+						'<tr><td class="text-start" colspan="8">The list is currently empty.</td></tr>'
 					);
-				});
+				}
 			} else {
 				$(".status").text(data.e);
 			};
@@ -401,57 +736,71 @@ function get_receive() {
 		success: function (data) {
 			// console.log(data);
 			if (data.s) {
-				var listtransactions = data.listsinceblock.transactions;
+				var listtransactions = data.transactions;
 				listtransactions.sort(function (a, b) {
 					return a.time - b.time
 				});
 				$('.transactions').html('');
-				$.each(listtransactions, function (index) {
-					if (listtransactions[index].category == 'receive') {
-						//check first, or it will splice index0
-						// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
-						// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
-						// }
-						switch (true) {
-							case listtransactions[index].confirmations >= 6:
-								var confirmationsImg = 'img/icon/transaction2.png';
-								break;
-							case listtransactions[index].confirmations >= 5:
-								var confirmationsImg = 'img/icon/clock5.png';
-								break;
-							case listtransactions[index].confirmations >= 4:
-								var confirmationsImg = 'img/icon/clock4.png';
-								break;
-							case listtransactions[index].confirmations >= 3:
-								var confirmationsImg = 'img/icon/clock3.png';
-								break;
-							case listtransactions[index].confirmations >= 2:
-								var confirmationsImg = 'img/icon/clock2.png';
-								break;
-							default:
-								var confirmationsImg = 'img/icon/clock1.png';
-								break;
-						}
-						var amount = listtransactions[index].amount;
-						if (amount > 0) {
-							var amountClass = '';
-							var amountSymbol = '+';
-						} else {
-							var amountClass = 'negative';
-							var amountSymbol = '';
-						}
+				if (listtransactions.length > 0) {
+					$.each(listtransactions, function (index) {
+						var confirmationsImg = 'img/icon/clock1.png';
+						if (listtransactions[index].category == 'receive') {
+							//check first, or it will splice index0
+							// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
+							// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
+							// }
+							switch (true) {
+								case listtransactions[index].confirmations >= 6:
+									confirmationsImg = 'img/icon/transaction2.png';
+									break;
+								case listtransactions[index].confirmations >= 5:
+									confirmationsImg = 'img/icon/clock5.png';
+									break;
+								case listtransactions[index].confirmations >= 4:
+									confirmationsImg = 'img/icon/clock4.png';
+									break;
+								case listtransactions[index].confirmations >= 3:
+									confirmationsImg = 'img/icon/clock3.png';
+									break;
+								case listtransactions[index].confirmations >= 2:
+									confirmationsImg = 'img/icon/clock2.png';
+									break;
+								default:
+									confirmationsImg = 'img/icon/clock1.png';
+									break;
+							}
+							var amount = listtransactions[index].amount;
+							if (amount > 0) {
+								var amountClass = '';
+								var amountSymbol = '+';
+							} else {
+								var amountClass = 'negative';
+								var amountSymbol = '';
+							}
 
-						$('.transactions').prepend(
-							'<tr>' +
-							'<td>' + (index + 1) + '</td>' +
-							'<td style="text-align:left;"><span style="color:blue;">' + (listtransactions[index].account == "" ? "default" : listtransactions[index].account) + "</span><br>" + listtransactions[index].address + '</td>' +
-							'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
-							'<td><img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')</td>' +
-							'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
-							'</tr>'
-						);
-					}
-				});
+							var td_account_address = listtransactions[index].address;
+							var td_block = listtransactions[index].blockhash;
+							var td_txid = listtransactions[index].txid;
+
+							$('.transactions').prepend(
+								'<tr>' +
+								'<td>' + (index + 1) + '</td>' +
+								'<td style="text-align:left;">' + td_account_address + '</td>' +
+								'<td><a href="' + explore_url_block + td_block + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_mined.png" width="36" height="36" /></a>' + '</td>' +
+								'<td><a href="' + explore_url_tx + td_txid + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_inout.png" width="36" height="36" /></a>' + '</td>' +
+								'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
+								'<td><img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')</td>' +
+								'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
+								'</tr>'
+							);
+						}
+					});
+				}
+				else {
+					$('.transactions').prepend(
+						'<tr><td class="text-start" colspan="7">The list is currently empty.</td></tr>'
+					);
+				}
 			} else {
 				$(".status").text(data.e);
 			};
@@ -482,7 +831,7 @@ function get_address() {
 						$('.transactions').append(
 							'<tr>' +
 							'<td>' + (index + 1) + '</td>' +
-							'<td style="text-align:left;"><span style="color:blue;">' + (key == "" ? "default" : key) + "</span></td>" +
+							// '<td style="text-align:left;"><span style="color:blue;">' + (key == "" ? "default" : key) + "</span></td>" +
 							'<td style="text-align:left;">' + value + '</td>' +
 							'</tr>'
 						);
@@ -512,59 +861,66 @@ function get_send() {
 		success: function (data) {
 			// console.log(data);
 			if (data.s) {
-				var listtransactions = data.listsinceblock.transactions;
+				var listtransactions = data.transactions;
 				listtransactions.sort(function (a, b) {
 					return a.time - b.time
 				});
 				$('.transactions').html('');
-				$.each(listtransactions, function (index) {
-					if (listtransactions[index].category == 'send') {
-						//check first, or it will splice index0
-						// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
-						// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
-						// }
-						switch (true) {
-							case listtransactions[index].confirmations >= 6:
-								var confirmationsImg = 'img/icon/transaction2.png';
-								break;
-							case listtransactions[index].confirmations >= 5:
-								var confirmationsImg = 'img/icon/clock5.png';
-								break;
-							case listtransactions[index].confirmations >= 4:
-								var confirmationsImg = 'img/icon/clock4.png';
-								break;
-							case listtransactions[index].confirmations >= 3:
-								var confirmationsImg = 'img/icon/clock3.png';
-								break;
-							case listtransactions[index].confirmations >= 2:
-								var confirmationsImg = 'img/icon/clock2.png';
-								break;
-							default:
-								var confirmationsImg = 'img/icon/clock1.png';
-								break;
-						}
-						var amount = listtransactions[index].amount;
-						if (amount > 0) {
-							var amountClass = '';
-							var amountSymbol = '+';
-						} else {
-							var amountClass = 'negative';
-							var amountSymbol = '';
-						}
+				if (listtransactions.length > 0) {
+					$.each(listtransactions, function (index) {
+						var confirmationsImg = 'img/icon/clock1.png';
+						if (listtransactions[index].category == 'send') {
+							//check first, or it will splice index0
+							// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
+							// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
+							// }
+							switch (true) {
+								case listtransactions[index].confirmations >= 6:
+									confirmationsImg = 'img/icon/transaction2.png';
+									break;
+								case listtransactions[index].confirmations >= 5:
+									confirmationsImg = 'img/icon/clock5.png';
+									break;
+								case listtransactions[index].confirmations >= 4:
+									confirmationsImg = 'img/icon/clock4.png';
+									break;
+								case listtransactions[index].confirmations >= 3:
+									confirmationsImg = 'img/icon/clock3.png';
+									break;
+								case listtransactions[index].confirmations >= 2:
+									confirmationsImg = 'img/icon/clock2.png';
+									break;
+								default:
+									confirmationsImg = 'img/icon/clock1.png';
+									break;
+							}
+							var amount = listtransactions[index].amount;
+							if (amount > 0) {
+								var amountClass = '';
+								var amountSymbol = '+';
+							} else {
+								var amountClass = 'negative';
+								var amountSymbol = '';
+							}
 
-						$('.transactions').prepend(
-							'<tr>' +
-							'<td>' + (index + 1) + '</td>' +
-							'<td class="text-left">' + (listtransactions[index].address == undefined ? '' : listtransactions[index].address) +
-							'<br>txid:<a href="' + explore_url_tx + listtransactions[index].txid + '" target="_blank">' + listtransactions[index].txid + '</a>' +
-							'</td>' +
-							'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
-							'<td><img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')</td>' +
-							'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
-							'</tr>'
-						);
-					}
-				});
+							$('.transactions').prepend(
+								'<tr>' +
+								'<td>' + (index + 1) + '</td>' +
+								'<td class="text-left">' + (listtransactions[index].address == undefined ? '' : listtransactions[index].address) +
+								'<br>txid:<a href="' + explore_url_tx + listtransactions[index].txid + '" target="_blank">' + listtransactions[index].txid + '</a>' +
+								'</td>' +
+								'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
+								'<td><img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')</td>' +
+								'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
+								'</tr>'
+							);
+						}
+					});
+				} else {
+					$('.transactions').prepend(
+						'<tr><td class="text-start" colspan="5">The list is currently empty.</td></tr>'
+					);
+				}
 			} else {
 				$(".status").text(data.e);
 			};
@@ -698,7 +1054,7 @@ function send_to_address_direct(address, amount_min, amount_max) {
 			console.log(textStatus);
 			console.log(errorThrown);
 		},
-		complete: function (XMLHttpRequest, textStatus) {}
+		complete: function (XMLHttpRequest, textStatus) { }
 	});
 }
 

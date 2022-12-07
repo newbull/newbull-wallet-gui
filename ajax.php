@@ -9,9 +9,8 @@ $bitcoinrpc = new Bitcoin($config["rpc_user"], $config["rpc_password"], $config[
 
 $action = isset($_POST['action']) ? $_POST['action'] : "";
 switch ($action) {
-    case 'get_wallet_info':
+    case 'getinfo':
         $getinfo = $bitcoinrpc->getinfo();
-        $getmininginfo = $bitcoinrpc->getmininginfo();
         //$listsinceblock = $bitcoin->listsinceblock();
         //$getgenerate = $bitcoin->getgenerate();
         //$getconnectioncount = $bitcoin->getconnectioncount();
@@ -24,11 +23,169 @@ switch ($action) {
             $data['s'] = 1;
             $data['balance'] = $getinfo['balance'];
             $data['connections'] = $getinfo['connections'];
+            exit(json_encode($data));
+        }
+        $data = array();
+        $data['s'] = 0;
+        $data['e'] = $bitcoinrpc->error;
+        exit(json_encode($data));
+        break;
+    case 'getmininginfo':
+        $getmininginfo = $bitcoinrpc->getmininginfo();
+        if ($bitcoinrpc->status == 200) {
+            $data = array();
+            $data['s'] = 1;
             $data['chain'] = $getmininginfo['chain'];
             $data['generate'] = $getmininginfo['generate'];
-            $data['unconfirmedbalance'] = $bitcoinrpc->getunconfirmedbalance();
-            $data['listsinceblock'] = $bitcoinrpc->listsinceblock();
-            $data['listtransactions'] = $bitcoinrpc->listtransactions();
+            exit(json_encode($data));
+        }
+        $data = array();
+        $data['s'] = 0;
+        $data['e'] = $bitcoinrpc->error;
+        exit(json_encode($data));
+        break;
+    case 'getwalletinfo':
+        $getwalletinfo = $bitcoinrpc->getwalletinfo();
+        if ($bitcoinrpc->status == 200) {
+            $data = array();
+            $data['s'] = 1;
+            $data['walletversion'] = $getwalletinfo['walletversion'];
+            $data['unconfirmed_balance'] = $getwalletinfo['unconfirmed_balance'];
+            $data['immature_balance'] = $getwalletinfo['immature_balance'];
+            $data['txcount'] = $getwalletinfo['txcount'];
+            exit(json_encode($data));
+        }
+        $data = array();
+        $data['s'] = 0;
+        $data['e'] = $bitcoinrpc->error;
+        exit(json_encode($data));
+        break;
+    // case 'listsinceblock':
+    //     $listsinceblock = $bitcoinrpc->listsinceblock();
+    //     if ($bitcoinrpc->status == 200) {
+    //         $transactions = $listsinceblock->transactions;
+    //         $immaturebalance = 0;
+    //         foreach ($transactions as $v) {
+    //             if ($v->category == 'immature') {
+    //                 $immaturebalance += $v->amount;
+    //             }
+    //         }
+    //         $data = array();
+    //         $data['s'] = 1;
+    //         $data['immaturebalance'] = $immaturebalance;
+    //         exit(json_encode($data));
+    //     }
+    //     $data = array();
+    //     $data['s'] = 0;
+    //     $data['e'] = $bitcoinrpc->error;
+    //     exit(json_encode($data));
+    //     break;
+    case 'listtransactions':
+        $listtransactions = $bitcoinrpc->listtransactions();
+        if ($bitcoinrpc->status == 200) {
+            $data = array();
+            $data['s'] = 1;
+            $data['listtransactions'] = $listtransactions;
+            exit(json_encode($data));
+        }
+        $data = array();
+        $data['s'] = 0;
+        $data['e'] = $bitcoinrpc->error;
+        exit(json_encode($data));
+        break;
+    case 'listmemorypooltransactions':
+        //get address
+        $listaccounts = $bitcoinrpc->listaccounts();
+        if ($bitcoinrpc->status !== 200 && $bitcoinrpc->error !== '') {
+            $data = array();
+            $data['s'] = 0;
+            $data['e'] = $bitcoinrpc->error;
+            exit(json_encode($data));
+        }
+        // $getaddressesbyaccount = array();
+        $getaddressesbyaccount_array = array();
+        // $getaddressesbyaccount_list = array();
+        foreach ($listaccounts as $key => $value) {
+            $address_array = $bitcoinrpc->getaddressesbyaccount($key);
+            if ($bitcoinrpc->status !== 200 && $bitcoinrpc->error !== '') {
+                $data = array();
+                $data['s'] = 0;
+                $data['e'] = $bitcoinrpc->error;
+                exit(json_encode($data));
+            }
+            // $getaddressesbyaccount += $address;
+            // $getaddressesbyaccount_list[$key] = $address_array;
+            // if ($key) {
+            //     array_merge($getaddressesbyaccount_array, $address_array[$key]);
+            // } else {
+            // print_r($address_array);
+            // array_merge($getaddressesbyaccount_array, $address_array);
+            $getaddressesbyaccount_array += $address_array;
+            // print_r($getaddressesbyaccount_array);
+            // $a1 = array("a" => "red", "b" => "green");
+            // $a2 = array("c" => "blue", "b" => "yellow");
+            // print_r(array_merge($a1, $a2));
+            //     foreach ($address_array as $k => $v) {
+            //         print_r($v);
+            //         array_merge($getaddressesbyaccount_array, $v);
+            //     }
+            // }
+        }
+
+        //get mem pool
+        $listmemorypooltransactions = array();
+
+        $getrawmempool = $bitcoinrpc->getrawmempool();
+        if ($bitcoinrpc->status !== 200 && $bitcoinrpc->error !== '') {
+            $data = array();
+            $data['s'] = 0;
+            $data['e'] = $bitcoinrpc->error;
+            exit(json_encode($data));
+        }
+        foreach ($getrawmempool as $key => $tx) {
+            $transaction_detail = array();
+            $transaction_detail['tx'] = $tx;
+            $rawtransaction = $bitcoinrpc->getrawtransaction($tx, 1);
+            if ($rawtransaction === false) {
+                continue;
+            }
+
+            $is_my_mempool = false;
+
+            foreach ($rawtransaction['vout'] as $vout) {
+                if ($vout['value'] > 0.0) {
+                    $transaction_detail['vout'][$vout['n']]['addresses'] = $vout['scriptPubKey']['addresses'];
+                    $transaction_detail['vout'][$vout['n']]['value'] = trim_dotzero($vout['value']);
+                    // print_r($vout['scriptPubKey']['addresses']);
+                    // echo "\n";
+                    if (!$is_my_mempool) {
+                        foreach ($vout['scriptPubKey']['addresses'] as $key => $address) {
+                            if (in_array($address, $getaddressesbyaccount_array)) {
+                                $is_my_mempool = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if ($is_my_mempool) {
+                $listmemorypooltransactions[] = $transaction_detail;
+            }
+        }
+
+        $data = array();
+        $data['s'] = 1;
+        // $data['listaccounts'] = $listaccounts;
+        // $data['getaddressesbyaccount_list'] = $getaddressesbyaccount_list;
+        // $data['getaddressesbyaccount_array'] = $getaddressesbyaccount_array;
+        $data['listmemorypooltransactions'] = $listmemorypooltransactions;
+        // print_r($data);
+        exit(json_encode($data));
+        break;
+    case 'listaccounts':
+        $listaccounts = $bitcoinrpc->listaccounts();
+        if ($bitcoinrpc->status == 200) {
+            $data = array();
+            $data['s'] = 1;
             $data['listaccounts'] = $bitcoinrpc->listaccounts();
             exit(json_encode($data));
         }
@@ -38,13 +195,49 @@ switch ($action) {
         exit(json_encode($data));
         break;
     case 'get_history':
-    case 'get_send':
-    case 'get_receive':
         $listsinceblock = $bitcoinrpc->listsinceblock();
         if ($bitcoinrpc->status == 200) {
             $data = array();
             $data['s'] = 1;
             $data['listsinceblock'] = $listsinceblock;
+            exit(json_encode($data));
+        }
+        $data = array();
+        $data['s'] = 0;
+        $data['e'] = $bitcoinrpc->error;
+        exit(json_encode($data));
+        break;
+    case 'get_send':
+        $listsinceblock = $bitcoinrpc->listsinceblock();
+        if ($bitcoinrpc->status == 200) {
+            $transactions = array();
+            foreach ($listsinceblock as $key => $value) {
+                if ($value->category == 'send') {
+                    $transactions[] = $value;
+                }
+            }
+            $data = array();
+            $data['s'] = 1;
+            $data['transactions'] = $transactions;
+            exit(json_encode($data));
+        }
+        $data = array();
+        $data['s'] = 0;
+        $data['e'] = $bitcoinrpc->error;
+        exit(json_encode($data));
+        break;
+    case 'get_receive':
+        $listsinceblock = $bitcoinrpc->listsinceblock();
+        if ($bitcoinrpc->status == 200) {
+            $transactions = array();
+            foreach ($listsinceblock as $key => $value) {
+                if ($value->category == 'receive') {
+                    $transactions[] = $value;
+                }
+            }
+            $data = array();
+            $data['s'] = 1;
+            $data['transactions'] = $transactions;
             exit(json_encode($data));
         }
         $data = array();

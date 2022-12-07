@@ -8,6 +8,7 @@
 	<meta name="description" content="{$description}">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- Place favicon.ico in the root directory -->
+	<link rel="icon" href="{$root_path}{$wallet_path}favicon.ico" sizes="any">
 	<!-- all css here -->
 	<!-- bootstrap v4.6.0 css -->
 	<link rel="stylesheet" href="{$theme_path}css/bootstrap.min.css">
@@ -18,17 +19,31 @@
 	<!-- bootstrap js -->
 	<script src="{$theme_path}js/bootstrap.bundle.min.js"></script>
 	<!-- main js -->
-	<script src="{$theme_path}js/main.min.js?20210608"></script>
+	<script src="{$theme_path}js/main.min.js?20121207"></script>
 	<!-- Stats-Number-Scroller-Animation-JavaScript -->
 	<!-- <script src="{$theme_path}js/waypoints.min.js"></script>
 	<script src="{$theme_path}js/counterup.min.js"></script> -->
 	<script>
 		var symbol = '{$symbol}';
+		var root_path = '{$root_path}';
+		var wallet_path = '{$wallet_path}';
 		var theme_path = '{$theme_path}';
 		var ajax_url = '{$ajax_url}';
+		var explore_url_block = '{$explore_url_block}';
 		var explore_url_tx = '{$explore_url_tx}';
-		// $(document).ready(function ($) {
-		// });
+		var current_page = '{$current_page}';
+
+		$(document).ready(function () {
+			$(".nav-link").each(function (index, domElement) {
+				var _obj = $(domElement);
+				var _href = _obj.attr("href");
+				_obj.removeClass("active");
+				if (_href == root_path + wallet_path + current_page) {
+					_obj.addClass("active");
+				}
+			});
+		});
+
 	</script>
 </head>
 
@@ -36,10 +51,10 @@
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
 		<!-- Image and text -->
 		<nav class="navbar navbar-light bg-light">
-			<a class="navbar-brand" href="{$root_path}">
-				<img src="{$theme_path}img/logo/logo-209x64-white-border.png" alt="{$name} logo"
-					class="d-inline-block align-top" style="width: 104px; height: 32px;">
-			</a>
+			<!-- <a class="navbar-brand" href="{$root_path}"> -->
+			<img src="{$theme_path}img/logo/logo-209x64-white-border.png" alt="{$name} logo"
+				class="d-inline-block align-top" style="width: 104px; height: 32px;">
+			<!-- </a> -->
 		</nav>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
 			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,34 +63,34 @@
 
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav mr-auto">
-				<li class="nav-item active">
+				<!-- <li class="nav-item active">
 					<a class="nav-link" href="{$root_path}">
 						Home <span class="sr-only">(current)</span>
 					</a>
-				</li>
+				</li> -->
 				<li class="nav-item">
-					<a class="nav-link" href="{$root_path}{$wallet_path}">
-						Overview <span class="sr-only">(current)</span>
+					<a class="nav-link active" href="{$root_path}{$wallet_path}">
+						Wallet Overview <span class="sr-only">(current)</span>
 					</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="{$send}">
-						Send <span class="sr-only">(current)</span>
+						Send
 					</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="{$receive}">
-						Receive <span class="sr-only">(current)</span>
+						Receive
 					</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="{$address}">
-						Address <span class="sr-only">(current)</span>
+						Address
 					</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="{$history}">
-						History <span class="sr-only">(current)</span>
+						History
 					</a>
 				</li>
 			</ul>

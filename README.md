@@ -6,18 +6,18 @@ NewBull Wallet GUI work with [NewBull Core](https://newbull.org) fine. It's shou
 
 ## Requirements
 
--   Your PC of running NewBull Core
--   NewBull Core v0.14.2
--   Apache 2.4.x
--   PHP 5.6.x with CURL and JSON support enabled
+- Your PC of running NewBull Core
+- NewBull Core v0.14.2
+- Apache 2.4.x
+- PHP 5.6.x with CURL and JSON support enabled
 
 ## Installation
 
 Installation is quite simple, and just complete the following steps:
 
--   Copy the contents of the archive to your pc.
--   Modify the conf/config.php file with your own info and NewBull RPC info.
--   That's it! Open your any Modern Browsers to the install URL, and the wallet gui should come up.
+- Copy the contents of the archive to your pc.
+- Modify the conf/config.php file with your own info and NewBull RPC info.
+- That's it! Open your any Modern Browsers to the install URL, and the wallet gui should come up.
 
 Note:
 
@@ -27,20 +27,18 @@ Note:
 
 Below shows the URLs available:
 
--   / = Home page, showig overview.
--   /send = send newbull.
--   /receive = receive newbull.
--   /address = get new address.
--   /history = View all transaction.
+- / = Home page, showig overview.
+- /send = send newbull.
+- /receive = receive newbull.
+- /address = get new address.
+- /history = View all transaction.
 
 ## Theme / Template Modifications
 
--   Content css, js, img, pages, header and footer files are in /themes/theme2/ directory.
--   CSS uses Bootstrap 4.6.0 as requested.
+- Content css, js, img, pages, header and footer files are in /themes/theme2/ directory.
+- CSS uses Bootstrap 4.6.0 as requested.
 
 ## Donations
-
----
 
 NB: NbUSBit9Q8mrDYPMwv6fW17rykThe3X735
 
@@ -52,11 +50,47 @@ LTC:
 
 ## License
 
----
-
 MIT
 
+---
+
 ## Changelog
+
+2022-11-30 0.14.2.17
+
+change version from 1.7.0 to 0.14.2.17, This means that the current version is compatible with newbull/bitcoin core 0.14.2, and this is 17th update;
+
+add auto detection about root path;
+
+add highlight about navbar active item;
+
+add explore_url_block to config;
+
+add block and txid link to Overview, Receive, History page;
+
+add Wallet Version, Transactions and Memory Pool Transactions to Overview page;
+
+optimize Send, Receive, Address, History page;
+
+remove account from Overview, Receive, Address, History page. Because the account feature of newbull/bitcoin core 0.14.2 have some issues;
+
+remove wallet_path from config;
+
+remove Home from navbar;
+
+remove logo link from navbar;
+
+change Overview to Wallet Overview
+
+fix some known issues;
+
+1.6.0 2021-09-30
+
+Optimizes the behavior of the homepage to get many information;
+
+Reduce the load on your wallet;
+
+Greatly improves load speed and user experience;
 
 1.5.0 2021-06-07
 

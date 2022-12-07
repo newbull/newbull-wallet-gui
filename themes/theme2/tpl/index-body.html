@@ -5,7 +5,9 @@
 				<tr>
 					<th class="amount">Balance</th>
 					<th class="amount">Unconfirmed</th>
+					<th class="text-center">Transactions</th>
 					<th class="text-center">Status</th>
+					<th class="text-center">Wallet Version</th>
 					<th class="text-center">Blockchain</th>
 					<th class="text-center">Connections</th>
 				</tr>
@@ -22,7 +24,21 @@
 							Loading...
 						</span> {$symbol}
 					</td>
-					<td><span class="status">
+					<td><span class="totaltransactions">
+							<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+							Loading...
+						</span>
+						(<span class="memorypooltransactions">
+							<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+							Loading...
+						</span>)
+					</td>
+					<td><span class="wallet_status">
+							<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+							Loading...
+						</span>
+					</td>
+					<td><span class="walletversion">
 							<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
 							Loading...
 						</span>
@@ -42,7 +58,10 @@
 		</table>
 	</div>
 	<div class="row">
-		<div class="col-md-3">
+		&nbsp;<span class="text-danger m-auto status"></span>&nbsp;
+	</div>
+	<div class="row">
+		<!-- <div class="col-md-3">
 			<h2>Accounts</h2>
 			<div class="table-responsive">
 				<table class="table table-bordered table-striped table-hover">
@@ -62,15 +81,18 @@
 					</tbody>
 				</table>
 			</div>
-		</div>
-		<div class="col-md-9">
+		</div> -->
+		<div class="col">
 			<h2>Latest Transactions</h2>
 			<div class="table-responsive">
 				<table class="table table-bordered table-striped table-hover text-center">
 					<thead>
 						<tr>
 							<th></th>
-							<th>Account / Address</th>
+							<!-- <th>Account / Address</th> -->
+							<th>Address</th>
+							<th>Block</th>
+							<th>Txid</th>
 							<th></th>
 							<th></th>
 							<th></th>
@@ -78,7 +100,34 @@
 					</thead>
 					<tbody class="transactions">
 						<tr>
-							<td colspan="5">
+							<td colspan="7">
+								<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+								Loading...
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		&nbsp;<span class="text-danger m-auto"></span>&nbsp;
+	</div>
+	<div class="row">
+		<div class="col">
+			<h2>Memory Pool Transactions</h2>
+			<div class="table-responsive">
+				<table class="table table-bordered table-striped table-hover text-center">
+					<thead>
+						<tr>
+							<th>Transaction ID</th>
+							<th>Amount</th>
+							<th>Send To</th>
+						</tr>
+					</thead>
+					<tbody class="listmemorypooltransactions">
+						<tr>
+							<td colspan="3">
 								<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
 								Loading...
 							</td>
@@ -91,5 +140,5 @@
 </div>
 <script>
 	get_wallet_info();
-	var intval = setInterval("get_wallet_info()", 1000);
+	var intval = setInterval("get_wallet_info()", 10000);
 </script>
