@@ -44,12 +44,36 @@ switch ($action) {
         $data['e'] = $bitcoinrpc->error;
         exit(json_encode($data));
         break;
+    case 'getblockchaininfo':
+        $getblockchaininfo = $bitcoinrpc->getblockchaininfo();
+        if ($bitcoinrpc->status == 200) {
+            $msg = "";
+            $downloading = 0;
+            if ($getblockchaininfo['blocks'] < $getblockchaininfo['headers']) {
+                $msg = "Blocks downloading...";
+                $downloading = 1;
+            }
+            $data = array();
+            $data['s'] = 1;
+            $data['chain'] = $getblockchaininfo['chain'];
+            $data['blocks'] = $getblockchaininfo['blocks'];
+            $data['headers'] = $getblockchaininfo['headers'];
+            $data['mediantime'] = $getblockchaininfo['mediantime'];
+            $data['downloading'] = $downloading;
+            $data['msg'] = $msg;
+            exit(json_encode($data));
+        }
+        $data = array();
+        $data['s'] = 0;
+        $data['e'] = $bitcoinrpc->error;
+        exit(json_encode($data));
+        break;
     case 'getwalletinfo':
         $getwalletinfo = $bitcoinrpc->getwalletinfo();
         if ($bitcoinrpc->status == 200) {
             $data = array();
             $data['s'] = 1;
-            $data['walletversion'] = $getwalletinfo['walletversion'];
+            // $data['walletversion'] = $getwalletinfo['walletversion'];
             $data['unconfirmed_balance'] = $getwalletinfo['unconfirmed_balance'];
             $data['immature_balance'] = $getwalletinfo['immature_balance'];
             $data['txcount'] = $getwalletinfo['txcount'];
@@ -211,14 +235,15 @@ switch ($action) {
         $listsinceblock = $bitcoinrpc->listsinceblock();
         if ($bitcoinrpc->status == 200) {
             $transactions = array();
-            foreach ($listsinceblock as $key => $value) {
-                if ($value->category == 'send') {
+            foreach ($listsinceblock['transactions'] as $key => $value) {
+                if ($value['category'] == 'send') {
                     $transactions[] = $value;
                 }
             }
             $data = array();
             $data['s'] = 1;
             $data['transactions'] = $transactions;
+            // $data['listsinceblock'] = $listsinceblock;
             exit(json_encode($data));
         }
         $data = array();
@@ -230,14 +255,15 @@ switch ($action) {
         $listsinceblock = $bitcoinrpc->listsinceblock();
         if ($bitcoinrpc->status == 200) {
             $transactions = array();
-            foreach ($listsinceblock as $key => $value) {
-                if ($value->category == 'receive') {
+            foreach ($listsinceblock['transactions'] as $key => $value) {
+                if ($value['category'] == 'receive') {
                     $transactions[] = $value;
                 }
             }
             $data = array();
             $data['s'] = 1;
             $data['transactions'] = $transactions;
+            // $data['listsinceblock'] = $listsinceblock;
             exit(json_encode($data));
         }
         $data = array();

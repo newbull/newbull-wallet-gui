@@ -1,5 +1,5 @@
 <?php
-$version = '0.14.2.17';
+$version = '0.14.2.18';
 define("IN_SCRIPT", true);
 
 require_once 'conf/config.php';

@@ -56,6 +56,18 @@ MIT
 
 ## Changelog
 
+2022-12-08 0.14.2.18
+
+add Blocks downloading... status;
+
+add current blocks, blockchain headers and latest blockchain mediantime;
+
+remove Wallet Version from Overview page;
+
+remove Mining... status;
+
+fix some known issues;
+
 2022-11-30 0.14.2.17
 
 change version from 1.7.0 to 0.14.2.17, This means that the current version is compatible with newbull/bitcoin core 0.14.2, and this is 17th update;

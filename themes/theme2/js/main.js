@@ -114,7 +114,8 @@ function get_wallet_info() {
 				type: 'post',
 				dataType: 'json',
 				data: {
-					action: "getmininginfo"
+					// action: "getmininginfo"
+					action: "getblockchaininfo"
 				},
 				success: function (data) {
 					// console.log(data);
@@ -124,15 +125,25 @@ function get_wallet_info() {
 						//obj.reverse();
 						//console.log(obj);
 						$(".chain").text(obj.chain);
-
+						$(".blocks_blocks").text(obj.blocks);
+						$(".blocks_headers").text(obj.headers);
+						$(".blocks_mediantime").text(formatTimestampToDateTime(new Date(obj.mediantime * 1000), "yyyy-MM-dd hh:mm:ss"));
 						if (connections > 0) {
-							if (obj.generate) {
-								$(".wallet_status").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;Mining...');
+							// if (obj.generate) {
+							// 	$(".wallet_status").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;Mining...');
+							// 	//console.log(audioFlag);
+							// 	if (audioFlag != 1) {
+							// 		audioFlag = 1;
+							// 		playAudio('3');
+							// 	}
+							// }
+							if (obj.downloading) {
+								$(".wallet_status").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>&nbsp;' + obj.msg);
 								//console.log(audioFlag);
-								if (audioFlag != 1) {
-									audioFlag = 1;
-									playAudio('3');
-								}
+								// if (audioFlag != 1) {
+								// 	audioFlag = 1;
+								// 	playAudio('3');
+								// }
 							} else {
 								$(".wallet_status").html('<span class="spinner-border spinner-border-sm text-success" role="status" aria-hidden="true"></span>&nbsp;Synchronizing...');
 								//console.log(audioFlag);
@@ -277,7 +288,7 @@ function get_wallet_info() {
 												//time = unixTimestamp.toLocaleString()
 
 												var confirmationsImg = 'img/icon/clock1.png';
-												if (listtransactions[index].category == 'receive') {
+												if (listtransactions[index].category == 'receive' || listtransactions[index].category == 'send') {
 													//check first, or it will splice index0
 													// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
 													// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
@@ -633,7 +644,7 @@ function get_history() {
 						}
 
 						var confirmationsImg = 'img/icon/clock1.png';
-						if (listtransactions[index].category == 'receive') {
+						if (listtransactions[index].category == 'receive' || listtransactions[index].category == 'send') {
 							//check first, or it will splice index0
 							// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
 							// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
@@ -744,56 +755,56 @@ function get_receive() {
 				if (listtransactions.length > 0) {
 					$.each(listtransactions, function (index) {
 						var confirmationsImg = 'img/icon/clock1.png';
-						if (listtransactions[index].category == 'receive') {
-							//check first, or it will splice index0
-							// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
-							// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
-							// }
-							switch (true) {
-								case listtransactions[index].confirmations >= 6:
-									confirmationsImg = 'img/icon/transaction2.png';
-									break;
-								case listtransactions[index].confirmations >= 5:
-									confirmationsImg = 'img/icon/clock5.png';
-									break;
-								case listtransactions[index].confirmations >= 4:
-									confirmationsImg = 'img/icon/clock4.png';
-									break;
-								case listtransactions[index].confirmations >= 3:
-									confirmationsImg = 'img/icon/clock3.png';
-									break;
-								case listtransactions[index].confirmations >= 2:
-									confirmationsImg = 'img/icon/clock2.png';
-									break;
-								default:
-									confirmationsImg = 'img/icon/clock1.png';
-									break;
-							}
-							var amount = listtransactions[index].amount;
-							if (amount > 0) {
-								var amountClass = '';
-								var amountSymbol = '+';
-							} else {
-								var amountClass = 'negative';
-								var amountSymbol = '';
-							}
-
-							var td_account_address = listtransactions[index].address;
-							var td_block = listtransactions[index].blockhash;
-							var td_txid = listtransactions[index].txid;
-
-							$('.transactions').prepend(
-								'<tr>' +
-								'<td>' + (index + 1) + '</td>' +
-								'<td style="text-align:left;">' + td_account_address + '</td>' +
-								'<td><a href="' + explore_url_block + td_block + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_mined.png" width="36" height="36" /></a>' + '</td>' +
-								'<td><a href="' + explore_url_tx + td_txid + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_inout.png" width="36" height="36" /></a>' + '</td>' +
-								'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
-								'<td><img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')</td>' +
-								'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
-								'</tr>'
-							);
+						// if (listtransactions[index].category == 'receive' || listtransactions[index].category == 'send') {
+						//check first, or it will splice index0
+						// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
+						// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
+						// }
+						switch (true) {
+							case listtransactions[index].confirmations >= 6:
+								confirmationsImg = 'img/icon/transaction2.png';
+								break;
+							case listtransactions[index].confirmations >= 5:
+								confirmationsImg = 'img/icon/clock5.png';
+								break;
+							case listtransactions[index].confirmations >= 4:
+								confirmationsImg = 'img/icon/clock4.png';
+								break;
+							case listtransactions[index].confirmations >= 3:
+								confirmationsImg = 'img/icon/clock3.png';
+								break;
+							case listtransactions[index].confirmations >= 2:
+								confirmationsImg = 'img/icon/clock2.png';
+								break;
+							default:
+								confirmationsImg = 'img/icon/clock1.png';
+								break;
 						}
+						var amount = listtransactions[index].amount;
+						if (amount > 0) {
+							var amountClass = '';
+							var amountSymbol = '+';
+						} else {
+							var amountClass = 'negative';
+							var amountSymbol = '';
+						}
+
+						var td_account_address = listtransactions[index].address;
+						var td_block = listtransactions[index].blockhash;
+						var td_txid = listtransactions[index].txid;
+
+						$('.transactions').prepend(
+							'<tr>' +
+							'<td>' + (index + 1) + '</td>' +
+							'<td style="text-align:left;">' + td_account_address + '</td>' +
+							'<td><a href="' + explore_url_block + td_block + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_mined.png" width="36" height="36" /></a>' + '</td>' +
+							'<td><a href="' + explore_url_tx + td_txid + '" target="_blank"><img src="' + theme_path + 'img/icon/tx_inout.png" width="36" height="36" /></a>' + '</td>' +
+							'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
+							'<td><img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')</td>' +
+							'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
+							'</tr>'
+						);
+						// }
 					});
 				}
 				else {
@@ -869,52 +880,52 @@ function get_send() {
 				if (listtransactions.length > 0) {
 					$.each(listtransactions, function (index) {
 						var confirmationsImg = 'img/icon/clock1.png';
-						if (listtransactions[index].category == 'send') {
-							//check first, or it will splice index0
-							// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
-							// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
-							// }
-							switch (true) {
-								case listtransactions[index].confirmations >= 6:
-									confirmationsImg = 'img/icon/transaction2.png';
-									break;
-								case listtransactions[index].confirmations >= 5:
-									confirmationsImg = 'img/icon/clock5.png';
-									break;
-								case listtransactions[index].confirmations >= 4:
-									confirmationsImg = 'img/icon/clock4.png';
-									break;
-								case listtransactions[index].confirmations >= 3:
-									confirmationsImg = 'img/icon/clock3.png';
-									break;
-								case listtransactions[index].confirmations >= 2:
-									confirmationsImg = 'img/icon/clock2.png';
-									break;
-								default:
-									confirmationsImg = 'img/icon/clock1.png';
-									break;
-							}
-							var amount = listtransactions[index].amount;
-							if (amount > 0) {
-								var amountClass = '';
-								var amountSymbol = '+';
-							} else {
-								var amountClass = 'negative';
-								var amountSymbol = '';
-							}
-
-							$('.transactions').prepend(
-								'<tr>' +
-								'<td>' + (index + 1) + '</td>' +
-								'<td class="text-left">' + (listtransactions[index].address == undefined ? '' : listtransactions[index].address) +
-								'<br>txid:<a href="' + explore_url_tx + listtransactions[index].txid + '" target="_blank">' + listtransactions[index].txid + '</a>' +
-								'</td>' +
-								'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
-								'<td><img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')</td>' +
-								'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
-								'</tr>'
-							);
+						// if (listtransactions[index].category == 'send') {
+						//check first, or it will splice index0
+						// if ($.inArray(listtransactions[index].address, obj.getaddressesbyaccount) != -1) {
+						// 	obj.getaddressesbyaccount.splice($.inArray(listtransactions[index].address, obj.getaddressesbyaccount), 1);
+						// }
+						switch (true) {
+							case listtransactions[index].confirmations >= 6:
+								confirmationsImg = 'img/icon/transaction2.png';
+								break;
+							case listtransactions[index].confirmations >= 5:
+								confirmationsImg = 'img/icon/clock5.png';
+								break;
+							case listtransactions[index].confirmations >= 4:
+								confirmationsImg = 'img/icon/clock4.png';
+								break;
+							case listtransactions[index].confirmations >= 3:
+								confirmationsImg = 'img/icon/clock3.png';
+								break;
+							case listtransactions[index].confirmations >= 2:
+								confirmationsImg = 'img/icon/clock2.png';
+								break;
+							default:
+								confirmationsImg = 'img/icon/clock1.png';
+								break;
 						}
+						var amount = listtransactions[index].amount;
+						if (amount > 0) {
+							var amountClass = '';
+							var amountSymbol = '+';
+						} else {
+							var amountClass = 'negative';
+							var amountSymbol = '';
+						}
+
+						$('.transactions').prepend(
+							'<tr>' +
+							'<td>' + (index + 1) + '</td>' +
+							'<td class="text-left">' + (listtransactions[index].address == undefined ? '' : listtransactions[index].address) +
+							'<br>txid:<a href="' + explore_url_tx + listtransactions[index].txid + '" target="_blank">' + listtransactions[index].txid + '</a>' +
+							'</td>' +
+							'<td>' + formatTimestampToDateTime(new Date(listtransactions[index].time * 1000), "yyyy-MM-dd hh:mm:ss") + '</td>' +
+							'<td><img src="' + theme_path + confirmationsImg + '" width="24" height="24" />(' + listtransactions[index].confirmations + ')</td>' +
+							'<td class="amount"><span class="' + amountClass + '">' + amountSymbol + formatBlance(amount) + '</span> ' + symbol + '</td>' +
+							'</tr>'
+						);
+						// }
 					});
 				} else {
 					$('.transactions').prepend(
